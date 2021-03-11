@@ -1,13 +1,14 @@
 import requests
 import json
+from config import Config
+
 
 headers = {
-    "X-IG-API-KEY": "f6e357f2b8a0083bd5b89bd188e64ae2e159c1b4",
+    "X-IG-API-KEY": "apikey",
     "X-SECURITY-TOKEN": "bae8afa438e9b4fa579008823963e15731f7eb7ff00114a30fa9569e96cd33CD01111",
     "CST": "6d7141b70f236e3b8025ba551cad09d90c7cda1c146c1acc9a01293e6e5ffcCU01111",
     "Content-Type": "application/json; charset=UTF-8",
     "Accept": "application/json; charset=UTF-8",
-    "Version": "2"
 }
 
 body = {
@@ -21,18 +22,19 @@ body = {
     "orderType": "MARKET"
 }
 
+response = requests.get("https://demo-api.ig.com/gateway/deal/markets", params={"searchTerm": "AMD"}, headers=headers)
+
 response = requests.post("https://demo-api.ig.com/gateway/deal/positions/otc", headers=headers, data=json.dumps(body))
 
 #print(response.status_code)
 
-class API:
+class OrderAPI:
     def __init__(self, apikey, username, password):
         self.apikey = apikey
         self.CST = ""
         self.X_SECURITY_TOKEN = ""
         self.headers = {
             "X-IG-API-KEY": apikey,
-            "VERSION": "2",
             "Content-Type": "application/json; charset=UTF-8",
             "Accept": "application/json; charset=UTF-8"
         }
@@ -51,30 +53,52 @@ class API:
         self.X_SECURITY_TOKEN = response.headers["X-SECURITY-TOKEN"]
         self.headers["CST"] = self.CST
         self.headers["X-SECURITY-TOKEN"] = self.X_SECURITY_TOKEN
-        print("Updated security tokens")
+        print("Updated security tokens", self.CST, self.X_SECURITY_TOKEN)
 
-    def create_order(self, currency, epic, expiry, size):
+    def create_order(self, epic):
         order = {
-            "currencyCode": currency,
-            "epic": epic,
-            "expiry": expiry,
-            "direction": "BUY",
-            "size": size,
-            "forceOpen": False,
-            "guaranteedStop": False,
-            "orderType": "MARKET"
+            "currencyCode": "USD", #Eg USD, GBP
+            "epic": epic, #This is meant to tell you what stock is but idk tbh
+            "expiry": "DFB", #keep this at DFB probably
+            "direction": "BUY", #Keep at buy
+            "size": "1", #I think this is amount
+            "forceOpen": True, #Enables a second position to be opened
+            "guaranteedStop": False, #Stop loss is for losers
+            "orderType": "MARKET" #Executed at any price
         }
         return order
 
-    def execute_order(self, order):
+    def get_price(self, ticker):
         try:
-            response = requests.post("https://demo-api.ig.com/gateway/deal/positions/otc", data=json.dumps(order), headers=self.headers)
+            response = requests.get("https://demo-api.ig.com/gateway/deal/markets", params={'searchTerm': ticker}, headers=self.headers)
+            response.raise_for_status()
+        except requests.exceptions.HTTPError as err:
+            raise SystemExit(err)
+        response = response.json()
+        return response["markets"][0]["offer"]
+
+    def get_epic(self, ticker):
+        try:
+            response = requests.get("https://demo-api.ig.com/gateway/deal/markets", params={'searchTerm': ticker}, headers=self.headers)
+            response.raise_for_status()
+        except requests.exceptions.HTTPError as err:
+            raise SystemExit(err)
+        response = response.json()
+        return response["markets"][0]["epic"]
+
+    def execute_order(self, order):
+        executeheaders = self.headers.copy()
+        executeheaders["Version"] = "2"
+        try:
+            response = requests.post("https://demo-api.ig.com/gateway/deal/positions/otc", data=json.dumps(order), headers=executeheaders)
             response.raise_for_status()
         except requests.exceptions.HTTPError as err:
             raise SystemExit(err)
         print("success")
 
-test = API("f6e357f2b8a0083bd5b89bd188e64ae2e159c1b4", "demoaccount20212", "2JRjuUL7ypv3")
-test.get_tokens()
-testorder = test.create_order("USD", "IX.D.FTSE.DAILY.IP", "DFB", "3")
-test.execute_order(testorder)
+#print(Config.IG_API_KEY)
+
+#test = OrderAPI("apikey", "demoaccount20212", "apipass")
+#test.get_tokens()
+#testorder = test.create_order("USD", test.get_epic("AMD"))
+#test.execute_order(testorder)

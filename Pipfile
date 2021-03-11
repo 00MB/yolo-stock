@@ -10,6 +10,12 @@ flask-login = "*"
 flask-wtf = "*"
 flask-migrate = "*"
 plaid-python = "*"
+python-dotenv = "*"
+stripe = "*"
+datetime = "*"
+flask-script = "*"
+bs4 = "*"
+gunicorn = "*"
 
 [dev-packages]
 

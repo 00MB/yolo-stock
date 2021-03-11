@@ -1,0 +1,79 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@700&display=swap');
+
+* {
+  font-family: "Roboto", sans-serif;
+}
+
+h1,
+h2,
+h3 {
+	color: #2c3539;
+	font-family: "Roboto Condensed", sans-serif;
+}
+
+.text-head {
+	text-transform: uppercase;
+	color: #555;
+}
+
+
+body {
+	margin: 0;
+	padding: 50px;
+}
+
+input {
+	border: none;
+	outline: none;
+	padding: 16px;
+	background-color: #f5f5f5;
+}
+
+input[type="text"], input[type="password"] {
+	min-width: 250px;
+}
+
+input:focus {
+	background-color: #f1f1f1;
+}
+
+input[type="submit"] {
+	padding: 16px 32px;
+	background-color: #24D982;
+	color: #fff;
+	text-transform: uppercase;
+	cursor: pointer;
+	font-weight: bold;
+}
+
+.error {
+	color: red;
+	margin: 8px 0;
+}
+
+.logo {
+	font-family: "Roboto Condensed", sans-serif;
+	font-size: 50px;
+	font-weight: 1000;
+	text-decoration: none;
+	color: black;
+	display: flex;
+	align-items: center;
+}
+
+.logo img {
+	margin-right: 32px;
+}
+
+.logo:hover {
+	color: #24D982;
+}
+
+#content {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	margin-top: 32px;
+}
